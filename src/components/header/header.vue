@@ -223,7 +223,7 @@
       overflow: auto
       transition: all 0.5s
       background: rgba(7,17,27,0.8)
-      &.fade-enter-active, &.fade-enter-active
+      &.fade-enter-active
         transition: opacity .7s
       &.fade-enter, &.fade-leave-active
         opacity: 0

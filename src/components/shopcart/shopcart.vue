@@ -55,14 +55,11 @@
         this.selectFood.forEach((food)=>{
           count += food.count;
         });
-        if(count>=99){
-          count = 99;
-        }
         return count;
       },
       payDesc() {//计算起送状态
         if(this.totalPrice === 0) {//总价为0 默认
-          return `¥${this.deliveryPrice}元起送`;
+          return `¥${this.minPrice}元起送`;
         }else if (this.totalPrice < this.minPrice){//总价小于起送价
           let diff = this.minPrice - this.totalPrice;
           return `还差${diff}元起送`;

@@ -34,19 +34,23 @@
                     <span class="now">¥{{food.price}}</span>
                     <span class="old" v-show="food.oldPrice">¥{{food.oldPrice}}</span>
                   </div>
+                  <div class="cartcontrol-wrapper">
+                    <v-cartcontrol :food="food"></v-cartcontrol>
+                  </div>
                 </div>
               </li>
             </ul>
           </li>
         </ul>
       </div>
-      <v-shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
+      <v-shopcart :select-food="selectFood" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
   import BScroll from "better-scroll";//引入better scroll
   import shopcart from "../shopcart/shopcart.vue"; //引入购物车组件
+  import cartcontrol from "../cartcontrol/cartcontrol.vue";//引入添加商品组件
 
   const ERR_OK = 0;
   export default {
@@ -72,6 +76,17 @@
           }
         }
         return 0;
+      },
+      selectFood(){//拿到foods数据
+        let foods = [];
+        this.goods.forEach((good)=>{
+          good.foods.forEach((food)=>{
+            if(food.count){
+              foods.push(food);
+            }
+          });
+        });
+        return foods;
       }
     },
     created() {//钩子函数
@@ -117,7 +132,8 @@
       }
     },
     components: {//注册购物车组件
-      "v-shopcart": shopcart
+      "v-shopcart": shopcart,
+      "v-cartcontrol" : cartcontrol
     }
   };
 </script>
@@ -227,4 +243,8 @@
               text-decoration: line-through
               font-size: 10px
               color: rgb(147,153,159)
+          .cartcontrol-wrapper
+            position: absolute
+            right: 0
+            bottom: 12px
 </style>
