@@ -30,6 +30,7 @@
         }else {
           return this.food.count++;
         }
+        this.$emit('cartadd',event.target); //开发一个事件 传当前的dom对象到父级goods组件
       },
       decreasecart(){//减少物品
         if(this.food.count){

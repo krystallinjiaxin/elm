@@ -35,7 +35,7 @@
                     <span class="old" v-show="food.oldPrice">¥{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <v-cartcontrol :food="food"></v-cartcontrol>
+                    <v-cartcontrol v-on:cartadd="cartadd" :food="food"></v-cartcontrol>
                   </div>
                 </div>
               </li>
@@ -43,7 +43,7 @@
           </li>
         </ul>
       </div>
-      <v-shopcart :select-food="selectFood" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
+      <v-shopcart ref="shopcart" :select-food="selectFood" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
     </div>
 </template>
 
@@ -103,6 +103,15 @@
       });
     },
     methods: {
+      cartadd(target) {//拿到cartcontrol子组件传过来的dom对象
+        this._drop(target); //定一个方法
+      },
+      _drop(target){//把从cartcontrol子组件拿到的dom对象传到shopcart组件
+        //优化，异步执行
+        this.$nextTick(() => {
+          this.$refs.shopcart.drop(target);
+        });//访问子组件shopcart的方法传target过去
+      },
       _initScroll(){//初始滚动
         this.meunScroll = new BScroll(document.getElementById('menu-wrapper'), {
           toustast: true
