@@ -1,18 +1,17 @@
 <template>
     <div class="cartcontrol">
       <transition name="move">
-        <div class="cart-decrease" v-show="food.count>0" @touchstart="decreasecart">
+        <div class="cart-decrease" v-show="food.count>0" @touchstart.stop.prevent="decreasecart">
           <span class="inner icon-remove_circle_outline"></span>
         </div>
       </transition>
       <div class="cart-count" v-show="food.count>0">{{food.count}}</div>
-      <div class="cart-add icon-add_circle" v-on:touchstart="addCart"></div>
+      <div class="cart-add icon-add_circle" v-on:touchstart.stop.prevent="addCart"></div>
     </div>
 </template>
 
 <script type="text/ecmascript-6">
   import Vue from "vue";
-
   export default {
     props: {//购物的数据
       food: {
