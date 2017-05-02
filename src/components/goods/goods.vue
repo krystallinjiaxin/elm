@@ -5,7 +5,7 @@
           <li
           v-for="(item, index) in goods" class="menu-item"
           :class="{'currents':currentIndex===index}"
-          @touchend="selectMenu(index,$event)"
+          @touchstart="selectMenu(index,$event)"
           >
             <span class="text border-1px">
               <span v-show="item.type>0" class="icon" :class="classMap[item.type]"></span>
@@ -19,7 +19,7 @@
           <li v-for="item in goods" class="food-list food-list-hook">
             <h1 class="title">{{item.name}}</h1>
             <ul class="food-ul">
-              <li v-for="food in item.foods" class="food-item">
+              <li @touchstart="selectedsFood(food,$event)" v-for="food in item.foods" class="food-item">
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon" />
                 </div>
@@ -44,6 +44,7 @@
         </ul>
       </div>
       <v-shopcart ref="shopcart" :select-food="selectFood" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
+      <v-food :food="selectedFood" ref="food"></v-food>
     </div>
 </template>
 
@@ -51,6 +52,7 @@
   import BScroll from "better-scroll";//引入better scroll
   import shopcart from "../shopcart/shopcart.vue"; //引入购物车组件
   import cartcontrol from "../cartcontrol/cartcontrol.vue";//引入添加商品组件
+  import food from "../food/food.vue";//引入商品详情页
 
   const ERR_OK = 0;
   export default {
@@ -63,7 +65,8 @@
       return {
         goods: [], //商品数据
         listHeight: [], //每个li的高度
-        scrollY: 0 //滑动的位置
+        scrollY: 0, //滑动的位置
+        selectedFood: {}
       }
     },
     computed: {
@@ -103,6 +106,12 @@
       });
     },
     methods: {
+      selectedsFood(food,event){//点击显示商品详情信息
+        this.selectedFood = food;
+        this.$nextTick(() => {
+          this.$refs.food.show();
+        });
+      },
       cartadd(target) {//拿到cartcontrol子组件传过来的dom对象
         this._drop(target); //定一个方法
       },
@@ -114,7 +123,7 @@
       },
       _initScroll(){//初始滚动
         this.meunScroll = new BScroll(document.getElementById('menu-wrapper'), {
-          toustast: true
+          touchstart: true
         });
         this.foodsScroll = new BScroll(document.getElementById('foods-wrapper'), {
           probeType: 3 //监测滚动的位置
@@ -142,7 +151,8 @@
     },
     components: {//注册购物车组件
       "v-shopcart": shopcart,
-      "v-cartcontrol" : cartcontrol
+      "v-cartcontrol" : cartcontrol,
+      "v-food": food
     }
   };
 </script>
