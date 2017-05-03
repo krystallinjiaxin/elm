@@ -5,7 +5,7 @@
           <li
           v-for="(item, index) in goods" class="menu-item"
           :class="{'currents':currentIndex===index}"
-          @touchstart="selectMenu(index,$event)"
+          @click="selectMenu(index,$event)"
           >
             <span class="text border-1px">
               <span v-show="item.type>0" class="icon" :class="classMap[item.type]"></span>
@@ -19,7 +19,7 @@
           <li v-for="item in goods" class="food-list food-list-hook">
             <h1 class="title">{{item.name}}</h1>
             <ul class="food-ul">
-              <li @touchstart="selectedsFood(food,$event)" v-for="food in item.foods" class="food-item">
+              <li @click="selectedsFood(food,$event)" v-for="food in item.foods" class="food-item">
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon" />
                 </div>
@@ -123,9 +123,10 @@
       },
       _initScroll(){//初始滚动
         this.meunScroll = new BScroll(document.getElementById('menu-wrapper'), {
-          touchstart: true
+          click: true
         });
         this.foodsScroll = new BScroll(document.getElementById('foods-wrapper'), {
+          click: true,
           probeType: 3 //监测滚动的位置
         });
         this.foodsScroll.on('scroll',(pos) => {//拿到滚动的位置
@@ -142,11 +143,11 @@
           this.listHeight.push(Height);
         }
       },
-      selectMenu(index,e){//点击menu  切换li位置
-        //if(!e._constructed) return; //元素是没有这个的 better scroll event里有
+      selectMenu(index,event){//点击menu  切换li位置
+        if(!event._constructed) return; //元素是没有这个的 better scroll event里有
         let foodList = document.getElementsByClassName('food-list-hook');//找元素每个li
         let ele = foodList[index];
-        this.foodsScroll.scrollToElement(ele, 300);
+        this.foodsScroll.scrollToElement(ele, 200);
       }
     },
     components: {//注册购物车组件

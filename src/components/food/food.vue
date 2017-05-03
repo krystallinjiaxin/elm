@@ -31,6 +31,27 @@
           <h1 class="title">商品信息</h1>
           <p class="text">{{food.info}}</p>
         </div>
+        <div class="rating">
+          <h1 class="title">商品评价</h1>
+          <v-ratingselect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="food.ratings"></v-ratingselect>
+        </div>
+        <div class="rating-wrapper">
+          <ul v-show="food.ratings && food.ratings.length">
+            <li v-show="needShow(rating.rateType,rating.text)" v-for="rating in food.ratings" class="rating-item border-1px">
+              <div class="user">
+                <span class="name">{{rating.username}}</span>
+                <img :src="rating.avatar" alt="" class="avatar" width="12" height="12">
+              </div>
+              <div class="time">{{rating.rateTime}}</div>
+              <p class="text">
+                <span :class="{'icon-thumb_up':rating.rateType === 0,'icon-thumb_down':rating.rateType === 1}"></span>{{rating.text}}
+              </p>
+            </li>
+          </ul>
+          <div class="no-rating" v-show="!food.ratings || !food.ratings.length">
+
+          </div>
+        </div>
       </div>
     </div>
   </transition>
@@ -40,7 +61,12 @@
   import BScroll from "better-scroll";
   import cartcontrol from "../cartcontrol/cartcontrol.vue";
   import split from "../split/split.vue";
+  import ratingselect from "../ratingselect/ratingselect.vue";
   import Vue from "vue";
+  const POSITIVE = 0;
+  const NEGATIVE = 1;
+  const ALL = 2;
+
   export default {
     props: {
       food: {
@@ -49,12 +75,21 @@
     },
     data() {
       return {
-        showFalg: false
+        showFalg: false,
+        selectType: NEGATIVE,
+        onlyContent: true,
+        desc: {
+          all: "全部",
+          positive: "推荐",
+          negative: "吐槽"
+        }
       }
     },
     methods: {
       show() {//当goods父级组件发生点击触发子组件的方法
         this.showFalg = true; //显示详情页
+        //this.selectType = ALL;
+        //this.onlyContent = true;
         this.$nextTick(()=>{ //dom发生变化用
           if(!this.scroll){
             this.scroll = new BScroll(document.getElementById('food'),{//没有就new个
@@ -68,20 +103,44 @@
       hide() {//关闭详情页
         this.showFalg = false;
       },
-      addFirst(event) {
+      addFirst(event) {//把物品加入购物车
         this.$emit('cartadd',event.target); //开发一个事件 传当前的dom对象到父级goods组件
         Vue.set(this.food,'count',1);
+      },
+      needShow(type,text) {//判断是否有内容  或者 是否显示有内容
+        if(this.onlyContent && !text){ //判断是否显示内容
+          return false;
+        }
+        if(this.selectType === ALL){
+          return true;
+        }else {
+          return  this.selectType === type;
+        }
       }
+      // ratingtypeSelect(type){
+      //   this._setselectTypes(type);
+      // },
+      // _setselectTypes(type){
+      //   this.selectType = type;
+      // },
+      // contentToggle(boolean){
+      //   this._setcontents(boolean);
+      // },
+      // _setcontents(boolean){
+      //   this.selectType = boolean;
+      // }
     },
     components: {
       "v-cartcontrol" : cartcontrol,
-      "v-split": split
+      "v-split": split,
+      "v-ratingselect": ratingselect
     }
   };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="stylus" rel="stylesheet/stylus">
+  @import "../../commom/stylus/mixin.styl"
   .food
     position: fixed
     left: 0
@@ -180,4 +239,46 @@
         padding: 0 8px
         font-size: 12px
         color: rgb(77,85,93)
+    .rating
+      padding-top: 18px
+      .title
+        line-height: 14px
+        margin-left: 18px
+        font-size: 14px
+        color: rgb(7,17,27)
+    .rating-wrapper
+      padding: 0 18px
+      .rating-item
+        position: relative
+        padding: 16px 0
+        border-1px(rgba(7,17,27,0.1))
+        .user
+          position: absolute
+          right: 0
+          top: 16px
+          line-height: 12px
+          font-size: 0
+          .name
+            display: inline-block
+            margin-right: 6px
+            vertical-align: top
+            font-size: 10px
+            color: rgb(147,153,159)
+          .avatar
+            border-radius: 50%
+        .time
+          margin-bottom: 6px
+          font-size: 10px
+          line-height: 12px
+          color: rgb(147,153,159)
+        .text
+          line-height: 16px
+          font-size: 12px
+          color: rgb(7,17,27)
+          .icon-thumb_up,.icon-thumb_down
+            margin-right: 4px
+            line-height: 24px
+            font-size: 12px
+          .icon-thumb_up
+            color: rgb(0,160,220)
 </style>
