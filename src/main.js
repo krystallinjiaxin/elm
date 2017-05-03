@@ -41,4 +41,4 @@ new Vue({
  router
 });
 
-router.push('/goods'); //指定路由
+//router.push('/goods'); //指定路由

@@ -33,7 +33,13 @@
         </div>
         <div class="rating">
           <h1 class="title">商品评价</h1>
-          <v-ratingselect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="food.ratings"></v-ratingselect>
+          <v-ratingselect
+          v-on:ratingtypeselect="ratingtypeselect"
+          v-on:contenttoggle="contenttoggle"
+          :select-type="selectType"
+          :only-content="onlyContent"
+          :desc="desc"
+          :ratings="food.ratings"></v-ratingselect>
         </div>
         <div class="rating-wrapper">
           <ul v-show="food.ratings && food.ratings.length">
@@ -42,15 +48,13 @@
                 <span class="name">{{rating.username}}</span>
                 <img :src="rating.avatar" alt="" class="avatar" width="12" height="12">
               </div>
-              <div class="time">{{rating.rateTime}}</div>
+              <div class="time">{{rating.rateTime | formatDate}}</div>
               <p class="text">
                 <span :class="{'icon-thumb_up':rating.rateType === 0,'icon-thumb_down':rating.rateType === 1}"></span>{{rating.text}}
               </p>
             </li>
           </ul>
-          <div class="no-rating" v-show="!food.ratings || !food.ratings.length">
-
-          </div>
+          <div class="no-rating" v-show="!food.ratings || !food.ratings.length">暂无评价</div>
         </div>
       </div>
     </div>
@@ -63,6 +67,7 @@
   import split from "../split/split.vue";
   import ratingselect from "../ratingselect/ratingselect.vue";
   import Vue from "vue";
+  import {formatDate} from "../../commom/js/date.js";
   const POSITIVE = 0;
   const NEGATIVE = 1;
   const ALL = 2;
@@ -76,7 +81,7 @@
     data() {
       return {
         showFalg: false,
-        selectType: NEGATIVE,
+        selectType: ALL,
         onlyContent: true,
         desc: {
           all: "全部",
@@ -88,12 +93,12 @@
     methods: {
       show() {//当goods父级组件发生点击触发子组件的方法
         this.showFalg = true; //显示详情页
-        //this.selectType = ALL;
-        //this.onlyContent = true;
+        this.selectType = POSITIVE;
+        this.onlyContent = false;
         this.$nextTick(()=>{ //dom发生变化用
           if(!this.scroll){
             this.scroll = new BScroll(document.getElementById('food'),{//没有就new个
-
+              touchstart: true
             });
           }else {
             this.scroll.refresh(); //否则重新计算
@@ -114,21 +119,27 @@
         if(this.selectType === ALL){
           return true;
         }else {
-          return  this.selectType === type;
+          return type  === this.selectType;
         }
+      },
+      ratingtypeselect(type) {
+        this.selectType = type; //数据更新的时BScroll没有重新计算位置
+        this.$nextTick(()=>{
+          this.scroll.refresh(); //重新计算位置
+        });
+      },
+      contenttoggle(onlycontent) {
+        this.onlyContent = !onlycontent; //数据更新的时BScroll没有重新计算位置
+        this.$nextTick(()=>{
+          this.scroll.refresh(); //重新计算位置
+        });
       }
-      // ratingtypeSelect(type){
-      //   this._setselectTypes(type);
-      // },
-      // _setselectTypes(type){
-      //   this.selectType = type;
-      // },
-      // contentToggle(boolean){
-      //   this._setcontents(boolean);
-      // },
-      // _setcontents(boolean){
-      //   this.selectType = boolean;
-      // }
+    },
+    filters: {//格式化日期
+      formatDate(time) {
+        let date = new Date(time);
+        return formatDate(date,"yyyy-MM-dd hh:mm:ss");
+      }
     },
     components: {
       "v-cartcontrol" : cartcontrol,
@@ -281,4 +292,8 @@
             font-size: 12px
           .icon-thumb_up
             color: rgb(0,160,220)
+      .no-rating
+        padding: 16px 0
+        font-size: 12px
+        color: rgb(147,153,159)
 </style>

@@ -66,13 +66,13 @@
     methods: {
       select(type,event){//切换评论按钮
         //if(!event._constructed) return; //元素是没有这个的 better scroll event里有
-        this.selectType = type;
-        this.$emit('ratingtypeSelect',this.selectType);
+        //this.selectType = type; //不能直接改父级传过来的简单类型
+        this.$emit('ratingtypeselect',type);
       },
       toggleContent() { //切换有没有评论内容
         //if(!event._constructed) return; //元素是没有这个的 better scroll event里有
-        this.onlyContent = !this.onlyContent;
-        this.$emit('contentToggle',this.onlyContent);
+        //this.onlyContent = !this.onlyContent; //不能直接改父级传过来的简单类型
+        this.$emit('contenttoggle',this.onlyContent);
       }
     }
   };
