@@ -15,11 +15,12 @@ Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 
-Vue.use(VueRouter);
-Vue.use(VueResource); //全局安装路由功能
+Vue.use(VueRouter); //全局安装路由功能
+Vue.use(VueResource);
 // 2. 定义路由
 // 每个路由应该映射一个组件。
 const routes = [
+  { path: '*' , redirect: '/goods' },//重定向 默认显示
   { path: '/goods' , component: goods },
   { path: '/seller' , component: seller },
   { path: '/ratings' , component: ratings }
@@ -41,4 +42,4 @@ new Vue({
  router
 });
 
-//router.push('/goods'); //指定路由
+//router.push('/goods'); //指定路由 不推荐使用 刷新会取消缓存的页面

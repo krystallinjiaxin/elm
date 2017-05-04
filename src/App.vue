@@ -20,22 +20,26 @@
 
 <script type="text/ecmascript-6">
 import header from "./components/header/header.vue";
-
+import {urlParse} from "./commom/js/util.js";
 const ERR_OK = 0; //数据状态
 
 export default {
   data() {//拿到的数据
     return {
       seller: {
-
+        id: (() => {
+          let queryParam = urlParse();
+          return queryParam.id;
+        })()
       }
     }
   },
   created() {//钩子函数
-    this.$http.get('api/seller').then((response)=>{
+    this.$http.get('api/seller?id=' + this.seller.id).then((response)=>{
       response = response.body; //用.body转成对象  拿到的是个属性
       if(response.errno === ERR_OK){
-        this.seller = response.data;
+        //this.seller = response.data;
+        this.seller = Object.assign({},this.seller,response.data);//es6给对象扩展属性的方法
       }
     });
   },
