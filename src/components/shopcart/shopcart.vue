@@ -18,11 +18,13 @@
         </div>
       </div>
       <div class="ball-container">
-        <transition name="drop" v-for="ball in balls" @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter">
-          <div class="ball" v-show="ball.show">
-            <div class="inner inner-hook"></div>
-          </div>
-        </transition>
+        <div v-for="ball in balls">
+          <transition name="drop"  @before-enter="beforeDrop" @enter="dropping" @after-enter="afterDrop">
+            <div class="ball" v-show="ball.show">
+              <div class="inner inner-hook"></div>
+            </div>
+          </transition>
+        </div>
       </div>
       <transition name="fold">
         <div class="shopcart-list" v-show="listShow">
@@ -30,7 +32,7 @@
             <h1 class="title">购物车</h1>
             <span class="empty" @touchstart="empty">清空</span>
           </div>
-          <div class="list-content" id="list-content">
+          <div class="list-content" ref="listContent">
             <ul>
               <li class="food" v-for="food in selectFood">
                 <span class="name">{{food.name}}</span>
@@ -38,7 +40,7 @@
                   <span>¥{{food.price * food.count}}</span>
                 </div>
                 <div class="cartcontrol-wrapper">
-                  <v-cartcontrol :food="food"></v-cartcontrol>
+                  <v-cartcontrol @add="addFood" :food="food"></v-cartcontrol>
                 </div>
               </li>
             </ul>
@@ -64,7 +66,7 @@
           return [
             {
               price: 10,
-              count: 10
+              count: 1
             }
           ]
         }
@@ -81,6 +83,15 @@
     data() {
       return {
         balls: [
+          {
+            show: false
+          },
+          {
+            show: false
+          },
+          {
+            show: false
+          },
           {
             show: false
           },
@@ -133,8 +144,8 @@
         if(show) {
           this.$nextTick(()=>{
             if(!this.scroll){//判断有没有this.scroll，如果没有就实例化
-              this.scroll = new BScroll(document.getElementById('list-content'),{
-
+              this.scroll = new BScroll(this.$refs.listContent,{
+                click: true
               });
             }else {
               this.scroll.refresh(); //如果有就不用再实例化
@@ -158,13 +169,16 @@
           food.count = 0;
         });
       },
+      addFood(target) {//把当前点击的元素传到父级
+        this.drop(target);
+      },
       drop(el) {//在这做添加物品球下落运动
-        for(let i=0;i<this.balls.length;i++){//找到隐藏的小球
-          let ball = this.balls[i]; //拿到每个ball
-          if(!ball.show){
+        for (let i = 0; i < this.balls.length; i++) {
+          let ball = this.balls[i];
+          if (!ball.show) {
             ball.show = true;
             ball.el = el;
-            this.dropBalls.push(ball);//存储已经下落小球
+            this.dropBalls.push(ball);
             return;
           }
         }
@@ -175,24 +189,24 @@
         }
         this.fold = !this.fold;
       },
-      beforeEnter(el) {//进入动画之前
+      beforeDrop(el) {//进入动画之前
         let count = this.balls.length;
         while (count--) {
-          let ball = this.balls[count];//找到显示的小球做动画
-          if(ball.show){
+          let ball = this.balls[count];
+          if (ball.show) {
             let rect = ball.el.getBoundingClientRect();
             let x = rect.left - 32;
             let y = -(window.innerHeight - rect.top - 22);
-            el.style.display = '';//让球显示
-            el.style.webkitTransform = `translate3D(0,${y}px,0)`;
-            el.style.transform = `translate3D(0,${y}px,0)`;
+            el.style.display = '';
+            el.style.webkitTransform = `translate3d(0,${y}px,0)`;
+            el.style.transform = `translate3d(0,${y}px,0)`;
             let inner = el.getElementsByClassName('inner-hook')[0];
-            inner.style.webkitTransform = `translate3D(${x}px,0,0)`;
-            inner.style.transform = `translate3D(${x}px,0,0)`;
+            inner.style.webkitTransform = `translate3d(${x}px,0,0)`;
+            inner.style.transform = `translate3d(${x}px,0,0)`;
           }
         }
       },
-      enter(el) {//进入动画刚开始
+      dropping(el, done) {//进入动画刚开始
         /* eslint-disable no-unused-vars */
         let refresh = el.offsetHeight; //触发浏览器重绘
         this.$nextTick(()=>{
@@ -201,9 +215,10 @@
           let inner = el.getElementsByClassName('inner-hook')[0];
           inner.style.webkitTransform = 'translate3d(0,0,0)';
           inner.style.transform = 'translate3d(0,0,0)';
+          el.addEventListener('transitionend', done);
         });
       },
-      afterEnter(el) {//动画结束
+      afterDrop(el) {//动画结束
         let ball = this.dropBalls.shift();
         if(ball){
           ball.show = false;
@@ -315,25 +330,23 @@
         left: 32px
         bottom: 22px
         z-index: 200
-        &.drop-enter-active
-          transition: all 0.4s cubic-bezier(0.49,-0.29,0.75,0.41)
-          .inner
-            width: 16px
-            height: 16px
-            border-radius: 50%
-            background: rgb(0,160,220)
-            transition: all 0.4s linear
+        transition: all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41)
+        .inner
+          width: 16px
+          height: 16px
+          border-radius: 50%
+          background: rgb(0,160,220)
+          transition: all 0.4s linear
     .shopcart-list
       position: absolute
       top: 0
       left: 0
       z-index: -1
       width: 100%
-      transition: all 2.5s linear
+      transform: translate3d(0, -100%, 0)
       &.fold-enter-active,&.fold-leave-active
-        transition: all 2.5s linear
-        transform: translate3d(0,-100%,0)
-      &.fold-enter,&.fold-leave
+        transition: all 0.5s linear
+      &.fold-enter,&.fold-leave-active
         transform: translate3d(0,0,0)
       .list-header
         height: 40px

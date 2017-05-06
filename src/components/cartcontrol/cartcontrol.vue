@@ -1,12 +1,12 @@
 <template>
     <div class="cartcontrol">
       <transition name="move">
-        <div class="cart-decrease" v-show="food.count>0" @touchstart.stop.prevent="decreasecart">
+        <div class="cart-decrease" v-show="food.count>0" @click.stop.prevent="decreasecart">
           <span class="inner icon-remove_circle_outline"></span>
         </div>
       </transition>
       <div class="cart-count" v-show="food.count>0">{{food.count}}</div>
-      <div class="cart-add icon-add_circle" v-on:touchstart.stop.prevent="addCart"></div>
+      <div class="cart-add icon-add_circle" v-on:click.stop.prevent="addCart"></div>
     </div>
 </template>
 
@@ -18,22 +18,20 @@
         type: Object
       }
     },
-    created() {
-
-    },
     methods: {
       addCart(event){//添加物品
-        //if(!event._constructed) return;
+        if(!event._constructed) return;
         if(!this.food.count){
           Vue.set(this.food, 'count' ,1); //设置 arr key value
         }else {
-          return this.food.count++;
+          this.food.count++;
         }
-        this.$emit('cartadd',event.target); //开发一个事件 传当前的dom对象到父级goods组件
+        this.$emit('add',event.target); //开发一个事件 传当前的dom对象到父级goods组件
       },
       decreasecart(){//减少物品
+        if(!event._constructed) return;
         if(this.food.count){
-          return this.food.count--;
+           this.food.count--;
         }
       }
     }
@@ -47,10 +45,10 @@
     .cart-decrease
       display: inline-block
       padding: 6px
-      transition: all 0.4s
-      &.move-enter-active,&.move-leave-active
+      transition: all 0.4s linear
+      &.move-enter-active
         opacity: 1
-        transform: translate3D(0,0,0)
+        transform: translate3d(0,0,0)
       .inner
         display: inline-block
         line-height: 24px
@@ -58,7 +56,7 @@
         color: rgb(0,160,220)
         transition: all 0.4s linear
         transform: rotate(0)
-      &.move-enter,&.move-leave-active
+      &.move-enter,&.move-leave-to
         opacity: 0
         transform: translate3D(24px,0,0)
         .inner

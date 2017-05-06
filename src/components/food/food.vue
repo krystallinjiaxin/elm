@@ -1,5 +1,5 @@
 <template>
-  <transition name="fade">
+  <transition name="move">
     <div class="food" v-show="showFalg" id="food">
       <div class="">
         <div class="food-content">
@@ -160,11 +160,11 @@
     z-index: 30
     width: 100%
     background: #fff
-    &.fade-enter-active,&.fade-laver-active
-      transition: all 0.3s linear
-      transform: translate3d(0,0,0)
-    &.fade-enter,&.fade-laver-active
-      transform: translate3d(100%,0,0)
+    transform: translate3d(0, 0, 0)
+    &.move-enter-active, &.move-leave-active
+      transition: all 0.25s linear
+    &.move-enter, &.move-leave-active
+      transform: translate3d(100%, 0, 0)
     .image-header
       position: relative
       width: 100%

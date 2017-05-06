@@ -1,6 +1,7 @@
 <template>
+  <div>
     <div class="goods">
-      <div class="menu-wrapper" id="menu-wrapper">
+      <div class="menu-wrapper" ref="menuWrapper">
         <ul>
           <li
           v-for="(item, index) in goods" class="menu-item"
@@ -14,7 +15,7 @@
           </li>
         </ul>
       </div>
-      <div class="foods-wrapper" id="foods-wrapper">
+      <div class="foods-wrapper" ref="foodsWrapper">
         <ul>
           <li v-for="item in goods" class="food-list food-list-hook">
             <h1 class="title">{{item.name}}</h1>
@@ -35,7 +36,7 @@
                     <span class="old" v-show="food.oldPrice">¥{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <v-cartcontrol v-on:cartadd="cartadd" :food="food"></v-cartcontrol>
+                    <v-cartcontrol @add="drop" :food="food"></v-cartcontrol>
                   </div>
                 </div>
               </li>
@@ -43,8 +44,9 @@
           </li>
         </ul>
       </div>
-      <v-shopcart ref="shopcart" :select-food="selectFood" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
-      <v-food :food="selectedFood" ref="food"></v-food>
+        <v-shopcart ref="shopcart" :select-food="selectFood" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></v-shopcart>
+      </div>
+      <v-food @add="drop" :food="selectedFood" ref="food"></v-food>
     </div>
 </template>
 
@@ -53,7 +55,6 @@
   import shopcart from "../shopcart/shopcart.vue"; //引入购物车组件
   import cartcontrol from "../cartcontrol/cartcontrol.vue";//引入添加商品组件
   import food from "../food/food.vue";//引入商品详情页
-
   const ERR_OK = 0;
   export default {
     props: {
@@ -94,7 +95,7 @@
     },
     created() {//钩子函数
       this.classMap = ['decrease','discount','special','invoice','guarantee'];
-      this.$http.get('api/goods').then((response)=>{//拿到数据
+      this.$http.get('/api/goods').then((response)=>{//拿到数据
         response = response.body; //用.body转成对象  拿到的是个属性
         if(response.errno === ERR_OK){
           this.goods = response.data;
@@ -112,26 +113,23 @@
           this.$refs.food.show();
         });
       },
-      cartadd(target) {//拿到cartcontrol子组件传过来的dom对象
-        this._drop(target); //定一个方法
-      },
-      _drop(target){//把从cartcontrol子组件拿到的dom对象传到shopcart组件
-        //优化，异步执行
-        this.$nextTick(() => {
-          this.$refs.shopcart.drop(target);
-        });//访问子组件shopcart的方法传target过去
-      },
+      drop(target) {
+				//体验优化，异步执行下落动画
+				this.$nextTick(() => {
+					this.$refs.shopcart.drop(target);
+				});
+			},
       _initScroll(){//初始滚动
-        this.meunScroll = new BScroll(document.getElementById('menu-wrapper'), {
-          click: true
-        });
-        this.foodsScroll = new BScroll(document.getElementById('foods-wrapper'), {
-          click: true,
-          probeType: 3 //监测滚动的位置
-        });
-        this.foodsScroll.on('scroll',(pos) => {//拿到滚动的位置
-          this.scrollY = Math.abs(Math.round(pos.y));
-        });
+        this.menuScroll = new BScroll(this.$refs.menuWrapper, {
+					click: true
+				});
+				this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+					probeType: 3,
+					click: true
+				});
+				this.foodsScroll.on('scroll', (pos) => {
+					this.scrollY = Math.abs(Math.round(pos.y));
+				});
       },
       _calculateHeigth() {//获取每个li的高度
         let foodList = document.getElementsByClassName('food-list-hook');//找元素每个li
@@ -145,7 +143,7 @@
       },
       selectMenu(index,event){//点击menu  切换li位置
         if(!event._constructed) return; //元素是没有这个的 better scroll event里有
-        let foodList = document.getElementsByClassName('food-list-hook');//找元素每个li
+        let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook');//找元素每个li
         let ele = foodList[index];
         this.foodsScroll.scrollToElement(ele, 200);
       }

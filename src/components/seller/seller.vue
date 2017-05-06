@@ -105,7 +105,8 @@
       }
     },
     mounted() {//DOM更新完
-
+      //this._initScroll();
+      //this._initpicScroll();
     },
     methods: {
       toggleFavorite() {//点击收藏商家 或者 取消收藏
