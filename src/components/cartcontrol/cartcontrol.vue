@@ -6,7 +6,7 @@
         </div>
       </transition>
       <div class="cart-count" v-show="food.count>0">{{food.count}}</div>
-      <div class="cart-add icon-add_circle" v-on:click.stop.prevent="addCart"></div>
+      <div class="cart-add icon-add_circle" @click.stop.prevent="addCart"></div>
     </div>
 </template>
 
@@ -20,6 +20,10 @@
     },
     methods: {
       addCart(event){//添加物品
+        console.log(2)
+        if (!event._constructed) {
+          return;
+        }
         if(!event._constructed) return;
         if(!this.food.count){
           Vue.set(this.food, 'count' ,1); //设置 arr key value

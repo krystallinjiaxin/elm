@@ -36,7 +36,7 @@
                     <span class="old" v-show="food.oldPrice">¥{{food.oldPrice}}</span>
                   </div>
                   <div class="cartcontrol-wrapper">
-                    <v-cartcontrol @add="drop" :food="food"></v-cartcontrol>
+                    <cartcontrol @add="drop" :food="food"></cartcontrol>
                   </div>
                 </div>
               </li>
@@ -150,7 +150,7 @@
     },
     components: {//注册购物车组件
       "v-shopcart": shopcart,
-      "v-cartcontrol" : cartcontrol,
+      cartcontrol,
       "v-food": food
     }
   };

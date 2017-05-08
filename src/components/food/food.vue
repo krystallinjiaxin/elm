@@ -1,11 +1,11 @@
 <template>
   <transition name="move">
-    <div class="food" v-show="showFalg" id="food">
+    <div class="food" v-show="showFalg" ref="food">
       <div class="">
         <div class="food-content">
           <div class="image-header">
             <img class="image" :src="food.image" alt="">
-            <div class="back" @touchstart="hide">
+            <div class="back" @click="hide">
               <i class="icon-arrow_lift"></i>
             </div>
           </div>
@@ -20,10 +20,10 @@
             <span class="now">¥{{food.price}}</span><span class="old" v-show="food.oldPrice">¥{{food.oldPrice}}</span>
           </div>
           <div class="cartcontrol-wrapper">
-            <v-cartcontrol :food="food"></v-cartcontrol>
+            <v-cartcontrol @add="addFood" :food="food"></v-cartcontrol>
           </div>
           <transition name="fade">
-            <div @touchstart.stop.prevent="addFirst" class="buy" v-show="!food.count || food.count === 0">加入购物车</div>
+            <div @click.stop.prevent="addFirst" class="buy" v-show="!food.count || food.count === 0">加入购物车</div>
           </transition>
         </div>
         <v-split></v-split>
@@ -97,8 +97,8 @@
         this.onlyContent = false;
         this.$nextTick(()=>{ //dom发生变化用
           if(!this.scroll){
-            this.scroll = new BScroll(document.getElementById('food'),{//没有就new个
-              touchstart: true
+            this.scroll = new BScroll(this.$refs.food,{//没有就new个
+              click: true
             });
           }else {
             this.scroll.refresh(); //否则重新计算
@@ -109,7 +109,11 @@
         this.showFalg = false;
       },
       addFirst(event) {//把物品加入购物车
-        this.$emit('cartadd',event.target); //开发一个事件 传当前的dom对象到父级goods组件
+        console.log('click')
+        if (!event._constructed) {
+          return;
+        }
+        this.$emit('add',event.target); //开发一个事件 传当前的dom对象到父级goods组件
         Vue.set(this.food,'count',1);
       },
       needShow(type,text) {//判断是否有内容  或者 是否显示有内容
@@ -133,6 +137,9 @@
         this.$nextTick(()=>{
           this.scroll.refresh(); //重新计算位置
         });
+      },
+      addFood(target) {//把当前的dom对象传到父级
+        this.$emit('add', target);
       }
     },
     filters: {//格式化日期
@@ -232,12 +239,12 @@
         font-size: 10px
         color: #fff
         background: rgb(0,160,220)
-        transition: all 0.4s
+        opacity: 1
         &.fade-enter-active, &.fade-leave-active
           transition: all 0.4s
-          opacity: 1
         &.fade-enter, &.fade-leave-active
           opacity: 0
+          z-index: -1
     .info
       padding: 18px
       .title

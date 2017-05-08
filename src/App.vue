@@ -35,7 +35,7 @@ export default {
     }
   },
   created() {//钩子函数
-    this.$http.get('api/seller?id=' + this.seller.id).then((response)=>{
+    this.$http.get('/api/seller?id=' + this.seller.id).then((response)=>{
       response = response.body; //用.body转成对象  拿到的是个属性
       if(response.errno === ERR_OK){
         //this.seller = response.data;

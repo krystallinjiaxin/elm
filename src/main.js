@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import VueResource from 'vue-resource';
+Vue.use(VueResource);
 import VueRouter from 'vue-router';//引人路由
 import App from './App';
 //import router from './router'; //路由
@@ -16,7 +17,7 @@ Vue.config.productionTip = false;
 /* eslint-disable no-new */
 
 Vue.use(VueRouter); //全局安装路由功能
-Vue.use(VueResource);
+
 // 2. 定义路由
 // 每个路由应该映射一个组件。
 const routes = [
